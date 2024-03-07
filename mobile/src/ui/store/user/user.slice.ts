@@ -45,7 +45,7 @@ export const register = createAsyncThunk<Auth, UserRegisterInput>(
   }
 );
 
-export const counterSlice = createSlice({
+export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
@@ -90,6 +90,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { logout } = counterSlice.actions;
+export const { logout } = userSlice.actions;
 
-export default counterSlice.reducer;
+export default userSlice.reducer;

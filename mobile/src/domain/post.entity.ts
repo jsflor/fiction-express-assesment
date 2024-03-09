@@ -14,11 +14,13 @@ export interface PostInput {
 export interface PostRepository {
   getAll(): Promise<Post[]>;
   getOne(id: number): Promise<Post>;
+  delete(id: number): Promise<void>;
   create(input: PostInput): Promise<Post>;
 }
 
 export interface PostUsecase {
   getAll(): Promise<Post[]>;
   getOne(id: number): Promise<Post>;
+  delete(id: number): Promise<void>;
   create(input: PostInput): Promise<Post>;
 }

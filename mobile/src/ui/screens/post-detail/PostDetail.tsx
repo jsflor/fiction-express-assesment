@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { usePostDetail } from './usePostDetail';
+import { PostDetailView } from './PostDetailView';
+import { useRoute } from '@react-navigation/native';
 
 export const PostDetailScreen = () => {
+  const { params } = useRoute();
+  const { data, status, deletePost, deleteStatus, canDeletePost } =
+    usePostDetail((params as { id: number })?.id);
   return (
-    <View>
-      <Text>PostDetail screen</Text>
-    </View>
+    <PostDetailView
+      status={status}
+      post={data}
+      onDeletePost={deletePost}
+      deleteStatus={deleteStatus}
+      canDeletePost={canDeletePost}
+    />
   );
 };

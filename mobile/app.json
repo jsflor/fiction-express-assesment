@@ -1,6 +1,9 @@
 {
   "expo": {
     "name": "mobile",
-    "slug": "mobile"
+    "slug": "mobile",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

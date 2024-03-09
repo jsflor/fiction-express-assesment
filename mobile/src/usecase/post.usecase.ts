@@ -29,4 +29,10 @@ export class PostUsecaseImpl implements PostUsecase {
     console.log('🚀 ~ PostUsecaseImpl ~ getOne ~ res:', res);
     return res;
   }
+
+  async delete(id: number): Promise<void> {
+    const res = await this.postRepository.delete(id);
+    console.log('🚀 ~ PostUsecaseImpl ~ delete ~ res:', res);
+    return res;
+  }
 }

@@ -15,7 +15,7 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async register(input: UserRegisterInput): Promise<void> {
-    const res = await NetworkImpl.post('auth/register/', input);
+    const res = await NetworkImpl.post('auth/registration/', input);
 
     console.log('🚀 ~ UserRepositoryImpl ~ register ~ res:', res);
 

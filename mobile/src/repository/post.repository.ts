@@ -19,4 +19,10 @@ export class PostRepositoryImpl implements PostRepository {
     console.log('🚀 ~ PostRepositoryImpl ~ getOne ~ res:', res);
     return res;
   }
+
+  async delete(id: number): Promise<void> {
+    const res = await NetworkImpl.delete(`blogposts/${id}/`);
+    console.log('🚀 ~ PostRepositoryImpl ~ delete ~ res:', res);
+    return res;
+  }
 }

@@ -7,6 +7,7 @@ import {
 } from '../../../domain/user.entity';
 import { UserRepositoryImpl } from '../../../repository/user.repository';
 import { UserUsecaseImpl } from '../../../usecase/user.usecase';
+import { Status } from '../../../utils/types';
 
 const userRepository = new UserRepositoryImpl();
 const userUsecase = new UserUsecaseImpl(userRepository);
@@ -14,7 +15,7 @@ const userUsecase = new UserUsecaseImpl(userRepository);
 export interface UserState {
   user?: User;
   token?: string;
-  status: 'loading' | 'idle' | 'error' | 'fetched';
+  status: Status;
 }
 
 const initialState: UserState = {
@@ -73,9 +74,11 @@ export const userSlice = createSlice({
     });
     // REGISTER
     builder.addCase(register.pending, (state) => {
+      console.log('🚀 ~ builder.addCase.pending');
       state.status = 'loading';
     });
     builder.addCase(register.fulfilled, (state, { payload }) => {
+      console.log('🚀 ~ builder.addCase.rejected ~ fulfilled:', payload);
       state.token = payload.token;
       state.user = payload.user;
       state.status = 'fetched';

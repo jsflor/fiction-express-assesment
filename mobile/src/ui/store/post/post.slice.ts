@@ -2,15 +2,19 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Post, PostInput } from '../../../domain/post.entity';
 import { PostRepositoryImpl } from '../../../repository/post.repository';
 import { PostUsecaseImpl } from '../../../usecase/post.usecase';
+import { AppDispatch } from '../store';
+import { Status } from '../../../utils/types';
 
 const postRepository = new PostRepositoryImpl();
 const postUsecase = new PostUsecaseImpl(postRepository);
 
 export interface PostState {
   all?: Post[];
-  allStatus: 'loading' | 'idle' | 'error' | 'fetched';
+  allStatus: Status;
   detailed?: Post;
-  detailedStatus: 'loading' | 'idle' | 'error' | 'fetched';
+  detailedStatus: Status;
+  createStatus: Status;
+  deleteStatus: Status;
 }
 
 const initialState: PostState = {
@@ -18,9 +22,11 @@ const initialState: PostState = {
   allStatus: 'idle',
   detailed: undefined,
   detailedStatus: 'idle',
+  createStatus: 'idle',
+  deleteStatus: 'idle',
 };
 
-export const getAll = createAsyncThunk<Post[], void>(
+export const getAll = createAsyncThunk<Post[], void, { dispatch: AppDispatch }>(
   'post/getAll',
   // Declare the type your function argument here:
   async () => {
@@ -31,24 +37,47 @@ export const getAll = createAsyncThunk<Post[], void>(
   }
 );
 
-export const getOne = createAsyncThunk<Post, { id: number }>(
+export const getOne = createAsyncThunk<
+  Post,
+  { id: number },
+  { dispatch: AppDispatch }
+>(
   'post/getOne',
   // Declare the type your function argument here:
   async ({ id }: { id: number }) => {
     const response = await postUsecase.getOne(id);
     console.log('🚀 ~ post/getOne/response:', response);
-    // Inferred return type: Promise<Post[]>
+    // Inferred return type: Promise<Post>
     return response as Post;
   }
 );
 
-export const create = createAsyncThunk<Post, PostInput>(
+export const deleteOne = createAsyncThunk<
+  any,
+  { id: number },
+  { dispatch: AppDispatch }
+>(
+  'post/deleteOne',
+  // Declare the type your function argument here:
+  async ({ id }: { id: number }) => {
+    const response = await postUsecase.delete(id);
+    console.log('🚀 ~ post/deleteOne/response:', response);
+    // Inferred return type: Promise<Post>
+    return response;
+  }
+);
+
+export const create = createAsyncThunk<
+  Post,
+  PostInput,
+  { dispatch: AppDispatch }
+>(
   'post/create',
   // Declare the type your function argument here:
-  async (input: PostInput) => {
+  async (input: PostInput, { dispatch }) => {
     const response = await postUsecase.create(input);
     console.log('🚀 ~ post/create/response:', response);
-    // Inferred return type: Promise<Post[]>
+    // Inferred return type: Promise<Post>
     return response as Post;
   }
 );
@@ -56,7 +85,20 @@ export const create = createAsyncThunk<Post, PostInput>(
 export const postSlice = createSlice({
   name: 'post',
   initialState,
-  reducers: {},
+  reducers: {
+    setCreateStatus: (
+      state,
+      action: { payload: 'loading' | 'idle' | 'error' | 'fetched' }
+    ) => {
+      state.createStatus = action.payload;
+    },
+    setDeleteStatus: (
+      state,
+      action: { payload: 'loading' | 'idle' | 'error' | 'fetched' }
+    ) => {
+      state.deleteStatus = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     // GET ALL
     builder.addCase(getAll.pending, (state) => {
@@ -71,6 +113,7 @@ export const postSlice = createSlice({
       state.all = undefined;
       state.allStatus = 'error';
     });
+
     // GET ONE
     builder.addCase(getOne.pending, (state) => {
       state.detailedStatus = 'loading';
@@ -87,21 +130,35 @@ export const postSlice = createSlice({
 
     // CREATE
     builder.addCase(create.pending, (state) => {
-      // state.detailedStatus = 'loading';
+      console.log('🚀 ~ builder.addCase.pending ~ payload:');
+      state.createStatus = 'loading';
     });
     builder.addCase(create.fulfilled, (state, { payload }) => {
-      state.all = [...state.all, payload];
-      // state.detailedStatus = 'fetched';
+      console.log('🚀 ~ builder.addCase.fulfilled ~ payload:', payload);
+      // state.all = [...state.all, payload];
+      state.createStatus = 'fetched';
     });
     builder.addCase(create.rejected, (state, { payload }) => {
       console.error('🚀 ~ builder.addCase.rejected ~ payload:', payload);
-      // state.detailed = undefined;
-      // state.detailedStatus = 'error';
+      state.createStatus = 'error';
+    });
+
+    // DELETE ONE
+    builder.addCase(deleteOne.pending, (state) => {
+      state.deleteStatus = 'loading';
+    });
+    builder.addCase(deleteOne.fulfilled, (state, { payload }) => {
+      state.detailed = undefined;
+      state.deleteStatus = 'fetched';
+    });
+    builder.addCase(deleteOne.rejected, (state, { payload }) => {
+      console.error('🚀 ~ builder.addCase.rejected ~ payload:', payload);
+      state.deleteStatus = 'error';
     });
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {} = postSlice.actions;
+export const { setCreateStatus, setDeleteStatus } = postSlice.actions;
 
 export default postSlice.reducer;
